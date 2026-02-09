@@ -41,6 +41,13 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 
 Fore more details, visit the [uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
 
+To create the virtual environment and install the dependencies, run:
+
+```bash
+uv venv
+uv sync 
+```
+
 ## Basic Usage
 
 If you want to apply the retraining strategy to learn candidate models for the Rashomon set, you can run:
