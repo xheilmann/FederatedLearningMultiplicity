@@ -2,10 +2,11 @@ import os
 
 import pandas as pd
 import torch
-from Client.client import FlowerClient
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
+
+from Client.client import FlowerClient
 from Utils.preferences import Preferences
 
 

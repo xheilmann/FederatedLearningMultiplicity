@@ -7,6 +7,7 @@ import dill
 from flwr.server.client_manager import ClientManager
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.criterion import Criterion
+
 from Utils.preferences import Preferences
 
 
@@ -384,7 +385,7 @@ class SimpleClientManager(ClientManager):
         wait_file(f"{self.preferences.fed_dir}/train_nodes_per_round.pkl")
         if self.preferences.sweep and self.preferences.num_validation_nodes > 0:
             wait_file(f"{self.preferences.fed_dir}/validation_nodes_per_round.pkl")
-        
+
         wait_file(f"{self.preferences.fed_dir}/test_nodes_per_round.pkl")
 
         # Sample clients which meet the criterion

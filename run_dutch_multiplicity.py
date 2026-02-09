@@ -1,10 +1,7 @@
-import subprocess
 import os
+import subprocess
 
 from rashomon_cap_test import calculate_rashomon_capacity
-
-
-
 
 # # #Evaluate the global rashomon set and then evaluates 10 times the individual rashomon sets
 
@@ -152,7 +149,7 @@ from rashomon_cap_test import calculate_rashomon_capacity
 
 
 # #Evaluate the global rashomon set and then evaluates 10 times the individual rashomon sets
-cmd = f"python  multiplicity_evaluate.py --num_clients 50 --sampled_test_nodes_per_round 1.0 --dataset_name dutch --fed_dir training_data/dutch_50_clients/  --wandb True --dataset_path data/dutch/dutch.csv --partitioner_type non_iid --partitioner_alpha 1.0 --partitioner_by occupation --run_name global --project_name DutchMultiplicityEvaluation_50_clients  --baseline_accuracy 0.81828 --baseline_model training_data/dutch_50_clients/5_1.0_4/"
+cmd = "python  multiplicity_evaluate.py --num_clients 50 --sampled_test_nodes_per_round 1.0 --dataset_name dutch --fed_dir training_data/dutch_50_clients/  --wandb True --dataset_path data/dutch/dutch.csv --partitioner_type non_iid --partitioner_alpha 1.0 --partitioner_by occupation --run_name global --project_name DutchMultiplicityEvaluation_50_clients  --baseline_accuracy 0.81828 --baseline_model training_data/dutch_50_clients/5_1.0_4/"
 pro4 = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                         shell=True, preexec_fn=os.setsid)
 pro4.wait()

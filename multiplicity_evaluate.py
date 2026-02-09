@@ -1,31 +1,28 @@
 import argparse
 import os
-import shutil
 import signal
-import sys
 import time
 from typing import Any
 
-import numpy
-import numpy as np 
-import wandb
+import numpy as np
+from flwr.client import ClientApp
+from flwr.common import Context, ndarrays_to_parameters
+from flwr.server import ServerApp, ServerAppComponents, ServerConfig
+from flwr.simulation import run_simulation
+from flwr_datasets.partitioner import DirichletPartitioner, IidPartitioner
+from flwr_datasets.visualization import plot_label_distributions
+
 from Aggregations.aggregations import Aggregation
 from ClientManager.client_manager import SimpleClientManager
 from datasets import load_dataset
 from Datasets.dataset_utils import get_data_info, prepare_data_for_cross_device, prepare_data_for_cross_silo
-from flwr.client import ClientApp
-from flwr.common import Context, ndarrays_to_parameters, Parameters
-from flwr.server import ServerApp, ServerAppComponents, ServerConfig, client_proxy
-from flwr.simulation import run_simulation
-from flwr_datasets.partitioner import DirichletPartitioner, IidPartitioner
-from flwr_datasets.visualization import plot_label_distributions
+from main import setup_wandb, signal_handler
 from Models.utils import get_model
 from Server.evaluation_server import EvalServer
-
 from Strategy.custom_evaluation import CustomEvaluation
 from Utils.preferences import Preferences
-from Utils.utils import get_params, seed_everything
-from main import setup_wandb, signal_handler
+from Utils.utils import seed_everything
+
 
 def client_fn(context: Context) -> Any:
     """
@@ -78,14 +75,14 @@ def server_fn(context: Context) -> ServerAppComponents:
 
     for dir_name in os.listdir(preferences.fed_dir):
         full_path = os.path.join(preferences.fed_dir, dir_name)
-        
+
         if os.path.isdir(full_path):
             # Load the .npz file (acts like a dictionary)
             with np.load(f"{full_path}/model.npz") as data:
                 # FIX: Extract ALL arrays stored in the file, not just arr_0
                 # .files attribute lists keys like ['arr_0', 'arr_1', 'arr_2', 'arr_3']
                 loaded_arrays = [data[key] for key in data.files]
-                
+
                 # Convert the list of all arrays to Flower Parameters
                 global_model_init[dir_name] = ndarrays_to_parameters(loaded_arrays)
 

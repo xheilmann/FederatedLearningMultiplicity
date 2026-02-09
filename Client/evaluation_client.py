@@ -1,17 +1,17 @@
 import json
 import os
-from typing import Any, List
+from typing import Any
 
-import numpy
 import numpy as np
 import torch
 from flwr.client import NumPyClient
-from flwr.common import NDArrays, Scalar, parameters_to_ndarrays, ndarrays_to_parameters, Parameters
+from flwr.common import NDArrays, Scalar
+from torch import nn
+from torch.utils.data import DataLoader
+
 from Models.regression_model import RegressionModel
 from Models.simple_model import SimpleModel
 from Models.utils import get_model
-from torch import nn
-from torch.utils.data import DataLoader
 from Utils.multiplicity_evaluation import *
 
 # from Training.training import test, train
@@ -284,11 +284,11 @@ def load_models_sorted_by_epsilon(base_directory: str) -> dict:
 
 def load_parameters_from_file(file_path: str) -> NDArrays:
     """Load all parameters from a .npz file generically."""
-    
+
     # numpy.load acts as a context manager, so we don't need 'open()'
     with np.load(file_path) as data:
         # data.files is a list of all keys in the file (e.g., ['arr_0', 'arr_1', ...])
         # We extract every array associated with these keys.
         parameters = [data[key] for key in data.files]
-        
+
     return parameters

@@ -3,11 +3,12 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from Client.evaluation_client import FlowerClient
+
 # from Client.client import FlowerClient
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, TargetEncoder
 from torch.utils.data import DataLoader, Dataset
+
 from Utils.preferences import Preferences
 
 

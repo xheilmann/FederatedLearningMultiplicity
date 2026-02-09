@@ -1,12 +1,13 @@
 import os
 from typing import Any
+
 import dill
 import torch
 import torchvision
-from Client.client import FlowerClient
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
+
 from Utils.preferences import Preferences
 
 
@@ -169,7 +170,7 @@ def prepare_mnist_for_cross_silo(preferences: Preferences, partition: Any, parti
     else:
         print("Loading the Client for evaluation...")
         from Client.evaluation_client import FlowerClient
-        
+
     partition_train_test = partition.train_test_split(test_size=0.2, seed=preferences.seed)
     if preferences.sweep:
         print("[Preparing data for cross-silo for sweep...]")
@@ -190,7 +191,7 @@ def prepare_mnist_for_cross_silo(preferences: Preferences, partition: Any, parti
 
     train = partition_train_test["train"]
     test = partition_train_test["test"]
-    
+
     # store test on disk named with the partition id
     with open(f"./data/data_mnist/test_partition_{partition_id}.pt", "wb") as f:
         dill.dump(test, f)
@@ -199,7 +200,7 @@ def prepare_mnist_for_cross_silo(preferences: Preferences, partition: Any, parti
     trainloader = prepare_mnist(train, preferences)
     testloader = prepare_mnist(test, preferences)
 
-    
+
 
     return FlowerClient(
         trainloader=trainloader, valloader=testloader, preferences=preferences, partition_id=partition_id

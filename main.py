@@ -1,23 +1,23 @@
 import argparse
 import os
 import random
-import shutil
 import signal
 import sys
 import time
 from typing import Any
-import os 
+
 import wandb
-from Aggregations.aggregations import Aggregation
-from ClientManager.client_manager import SimpleClientManager
-from datasets import load_dataset
-from Datasets.dataset_utils import get_data_info, prepare_data_for_cross_device, prepare_data_for_cross_silo
 from flwr.client import ClientApp
 from flwr.common import Context, ndarrays_to_parameters
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.simulation import run_simulation
 from flwr_datasets.partitioner import DirichletPartitioner, IidPartitioner
 from flwr_datasets.visualization import plot_label_distributions
+
+from Aggregations.aggregations import Aggregation
+from ClientManager.client_manager import SimpleClientManager
+from datasets import load_dataset
+from Datasets.dataset_utils import get_data_info, prepare_data_for_cross_device, prepare_data_for_cross_silo
 from Models.utils import get_model
 from Server.server import Server
 from Strategy.fed_avg import FedAvg
@@ -315,12 +315,12 @@ if __name__ == "__main__":
         # Check if the string ends with .pkl
         if item.endswith(".pkl"):
             item_path = os.path.join(args.fed_dir, item)
-            
+
             # Verify it is a file (and not a directory named 'something.pkl')
             if os.path.isfile(item_path):
                 os.remove(item_path)
                 print(f"Removed: {item}")
-                
+
     wandb_run = (
         setup_wandb(
             project_name=args.project_name,

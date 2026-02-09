@@ -3,11 +3,12 @@ from typing import Any
 import torch
 from flwr.client import NumPyClient
 from flwr.common import NDArrays, Scalar
+from torch import nn
+from torch.utils.data import DataLoader
+
 from Models.regression_model import RegressionModel
 from Models.simple_model import SimpleModel
 from Models.utils import get_model
-from torch import nn
-from torch.utils.data import DataLoader
 
 # from Training.training import test, train
 from Utils.preferences import Preferences
@@ -103,7 +104,7 @@ class FlowerClient(NumPyClient):
         set_params(self.model.model, parameters)
         result_dict = {}
         evaluation = self.model.evaluate(testloader=self.valloader)
-        result_dict[f"accuracy"] = evaluation["accuracy"]
+        result_dict["accuracy"] = evaluation["accuracy"]
         result_dict["loss"] = evaluation["loss"]
         #result_dict[f"{key}_dp_local"] = evaluation["local_dp"]
         #result_dict[f"{key}_dp"] = json.dumps(evaluation["dp"])

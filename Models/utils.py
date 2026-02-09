@@ -2,6 +2,7 @@ import torch
 
 from Models.architectures import AbaloneNet, CelebaNet, LinearClassificationNet, SimpleMNISTModel
 
+
 #TODO: add/change models to fit the other papers
 def get_model(
     dataset: str,

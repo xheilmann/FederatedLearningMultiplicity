@@ -1,45 +1,39 @@
 import json
 import os
 import shutil
-import shutil
-from typing import Any, List
 
-import numpy
 import numpy as np
 import torch
-from datasets import load_dataset
-from flwr.client import NumPyClient
-from flwr.common import NDArrays, Scalar, parameters_to_ndarrays, ndarrays_to_parameters, Parameters
-from pandas import DataFrame
+from flwr.common import NDArrays
 from sklearn.model_selection import train_test_split
-from Datasets.mnist import prepare_mnist_for_centralised_evaluation
-
-from Client.evaluation_client import load_models_sorted_by_epsilon, load_parameters_from_file
-from Datasets.dutch import prepare_dutch, DutchDataset
-from Datasets.income import get_income_scaler, prepare_income, IncomeDataset
-from Models.regression_model import RegressionModel
-from Models.simple_model import SimpleModel
-from Models.utils import get_model
 from torch import nn
 from torch.utils.data import DataLoader
+
+from Client.evaluation_client import load_parameters_from_file
+from datasets import load_dataset
+from Datasets.dutch import DutchDataset, prepare_dutch
+from Datasets.income import IncomeDataset, get_income_scaler, prepare_income
+from Datasets.mnist import prepare_mnist_for_centralised_evaluation
+from main import setup_wandb
+from Models.simple_model import SimpleModel
+from Models.utils import get_model
 from Utils.multiplicity_evaluation import *
 
 # from Training.training import test, train
 from Utils.preferences import Preferences
-from Utils.utils import get_optimizer, get_params, set_params
-from main import setup_wandb
+from Utils.utils import get_optimizer, set_params
 
 epsilons = [0.0, 0.004, 0.008, 0.012, 0.016, 0.02, 0.024, 0.028, 0.032, 0.036, 0.04]
 
 def load_parameters_from_file(file_path: str) -> NDArrays:
     """Load all parameters from a .npz file generically."""
-    
+
     # numpy.load acts as a context manager, so we don't need 'open()'
     with np.load(file_path) as data:
         # data.files is a list of all keys in the file (e.g., ['arr_0', 'arr_1', ...])
         # We extract every array associated with these keys.
         parameters = [data[key] for key in data.files]
-        
+
     return parameters
 
 def centralized_evaluate(path, preferences, project_name=None, run_name=None):
@@ -111,7 +105,7 @@ def centralized_evaluate(path, preferences, project_name=None, run_name=None):
 
         print("Test dataset size:", len(test_dataset))
         valloader = DataLoader(test_dataset, shuffle=False)
-    
+
     elif preferences.dataset_name == "mnist":
         print("Preparing MNIST dataset for centralized evaluation...")
         valloader = prepare_mnist_for_centralised_evaluation()
@@ -126,9 +120,9 @@ def centralized_evaluate(path, preferences, project_name=None, run_name=None):
             parameters = load_parameters_from_file(f"{path}/{dir}/model.npz")
             # Convert model parameters to flwr.common.Parameters
             global_model_init[dir] = parameters
-        
+
     print("Loaded models for evaluation:", list(global_model_init.keys()))
-    
+
     print("Starting evaluation of models...")
     for key, value in global_model_init.items():
         set_params(model.model, value)
@@ -142,7 +136,7 @@ def centralized_evaluate(path, preferences, project_name=None, run_name=None):
 
     # Create epsilon directories
 
-    epsilon_counts = {epsilon: 0 for epsilon in epsilons}
+    epsilon_counts = dict.fromkeys(epsilons, 0)
     sorted_models = {epsilon: [] for epsilon in epsilons}
     sorted_models[None] = []
 
@@ -188,7 +182,7 @@ def centralized_evaluate(path, preferences, project_name=None, run_name=None):
         processed_models.add(model_name)
 
     rashomonratio = [float(epsilon_counts[eps]) for eps in sorted(epsilons)]
-    
+
     print("Evaluating sorted models for multiplicity metrics...")
     global_model_init = {}
     result_dict = {}
@@ -434,7 +428,7 @@ def centralized_evaluate(path, preferences, project_name=None, run_name=None):
         "vpr_90": vpr_90, "vpr_50": vpr_50, "vpr_90_difpriv": vpr_90_difpriv, "vpr_50_difpriv": vpr_50_difpriv,
         "score_var_90": score_var_90, "score_var_50": score_var_50, "score_var_90_difpriv": score_var_90_difpriv,
         "score_var_50_difpriv": score_var_50_difpriv,
-        "rc_90": rc_90, "rc_50": rc_50, "rc_90_difpriv": rc_90_difpriv, "rc_50_difpriv": rc_50_difpriv, 
+        "rc_90": rc_90, "rc_50": rc_50, "rc_90_difpriv": rc_90_difpriv, "rc_50_difpriv": rc_50_difpriv,
         "rashomon_ratio": rashomonratio})
     wandb_run.log(result_dict)
 

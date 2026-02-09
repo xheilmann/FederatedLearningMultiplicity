@@ -1,14 +1,13 @@
 import math
-from itertools import islice
+import multiprocessing
+from multiprocessing import Pool
+
+import numpy as np
 
 # SPDX-License-Identifier: Apache-2.0
 # Copyright : J.P. Morgan Chase & Co.
-import pandas as pd
-import numpy as np
 from diffprivlib import tools as dp
 
-import multiprocessing
-from multiprocessing import Pool
 
 def ambiguity(decisions, y):
     nsample = len(decisions[0])
@@ -102,7 +101,7 @@ def blahut_arimoto(Pygw, log_base=2, epsilon=1e-12, max_iter=100):
 
     m = Pygw.shape[0]
     c = Pygw.shape[1]
-    Pw = np.ones((m)) / m
+    Pw = np.ones(m) / m
     for cnt in range(int(max_iter)):
         ## q = P_wgy
         q = (Pw * Pygw.T).T

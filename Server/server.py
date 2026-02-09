@@ -3,11 +3,8 @@ import io
 import os
 import timeit
 from logging import INFO, WARNING
-import pickle as pkl
 
 import numpy
-
-from ClientManager.client_manager import SimpleClientManager
 from flwr.common import (
     Code,
     DisconnectRes,
@@ -17,7 +14,8 @@ from flwr.common import (
     FitRes,
     Parameters,
     ReconnectIns,
-    Scalar, parameters_to_ndarrays,
+    Scalar,
+    parameters_to_ndarrays,
 )
 from flwr.common.logger import log
 from flwr.common.typing import GetParametersIns
@@ -25,6 +23,8 @@ from flwr.server.client_proxy import ClientProxy
 from flwr.server.history import History
 from flwr.server.server_config import ServerConfig
 from flwr.server.strategy import FedAvg, Strategy
+
+from ClientManager.client_manager import SimpleClientManager
 from Utils.preferences import Preferences
 
 FitResultsAndFailures = tuple[

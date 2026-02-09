@@ -3,14 +3,15 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+from flwr.common import Context
+from torch.utils.data import DataLoader
+
 from Client.client import FlowerClient
 from Datasets.abalone import AbaloneDataset, get_abalone_scaler, prepare_abalone, prepare_abalone_for_cross_silo
 from Datasets.celeba import prepare_celeba, prepare_celeba_for_cross_silo
 from Datasets.dutch import DutchDataset, get_dutch_scaler, prepare_dutch, prepare_dutch_for_cross_silo
 from Datasets.income import get_income_scaler, prepare_income_for_cross_silo
 from Datasets.mnist import download_mnist, prepare_mnist, prepare_mnist_for_cross_silo
-from flwr.common import Context
-from torch.utils.data import DataLoader
 from Utils.preferences import Preferences
 
 

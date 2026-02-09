@@ -1,10 +1,7 @@
-import subprocess
 import os
+import subprocess
 
 from rashomon_cap_test import calculate_rashomon_capacity
-
-
-
 
 #Evaluate the global rashomon set and then evaluates 10 times the individual rashomon sets
 

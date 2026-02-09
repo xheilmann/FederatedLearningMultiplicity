@@ -1,12 +1,10 @@
 
-import subprocess
 import os
-
-from wandb.cli.cli import projects
+import subprocess
 
 from rashomon_cap_test import calculate_rashomon_capacity
 
-cmd = f"python  multiplicity_evaluate.py --num_clients 20 --sampled_test_nodes_per_round 1.0 --dataset_name income --fed_dir training_data/income/  --wandb True --€dataset_path data/income_reduced/ --partitioner_type non_iid --partitioner_alpha 1.0 --partitioner_by occupation --run_name global --project_name IncomeMultiplicityEvaluation --baseline_accuracy 0.75881 --baseline_model training_data/income/4_0.75_2"
+cmd = "python  multiplicity_evaluate.py --num_clients 20 --sampled_test_nodes_per_round 1.0 --dataset_name income --fed_dir training_data/income/  --wandb True --€dataset_path data/income_reduced/ --partitioner_type non_iid --partitioner_alpha 1.0 --partitioner_by occupation --run_name global --project_name IncomeMultiplicityEvaluation --baseline_accuracy 0.75881 --baseline_model training_data/income/4_0.75_2"
 pro4 = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                         shell=True, preexec_fn=os.setsid)
 pro4.wait()

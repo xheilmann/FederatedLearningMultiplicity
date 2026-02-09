@@ -1,12 +1,11 @@
 import os
 import random
-from collections import OrderedDict
 
 import numpy as np
 import torch
 from flwr.common import NDArrays
-from Utils.preferences import Preferences
 
+from Utils.preferences import Preferences
 
 # Two auxhiliary functions to set and extract parameters of a model
 # def set_params(model: torch.nn.Module, parameters: NDArrays) -> None:
@@ -21,12 +20,12 @@ def set_params(model: torch.nn.Module, parameters: list[np.ndarray]) -> None:
     Sets the parameters of a PyTorch model from a list of numpy arrays.
     """
     # zip loops over the model parameters and the loaded list simultaneously
-    params_generator = zip(model.parameters(), parameters)
-    
+    params_generator = zip(model.parameters(), parameters, strict=False)
+
     for param, input_param in params_generator:
         # 1. Convert numpy -> torch
         new_tensor = torch.from_numpy(input_param)
-        
+
         # 2. Match device (CPU/GPU) and dtype (Float32/Float64)
         # This is critical because your LinearClassificationNet uses .float()
         param.data = new_tensor.to(device=param.device, dtype=param.dtype)
@@ -35,7 +34,7 @@ def set_params(model: torch.nn.Module, parameters: list[np.ndarray]) -> None:
 def get_params(model: torch.nn.Module) -> NDArrays:
     """Extract model parameters as a list of NumPy arrays."""
     return [val.cpu().numpy() for _, val in model.state_dict().items()]
-    
+
 
 def get_optimizer(model: torch.nn.Module, preferences: Preferences) -> torch.optim.Optimizer:
     match preferences.optimizer.lower():

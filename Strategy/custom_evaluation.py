@@ -22,13 +22,10 @@ import os
 import shutil
 from collections.abc import Callable
 from logging import WARNING
-from typing import Any, Union, Optional
+from typing import Any
 
 import numpy
 import numpy as np
-from flwr.server import ClientManager
-
-from ClientManager.client_manager import SimpleClientManager
 from flwr.common import (
     EvaluateIns,
     EvaluateRes,
@@ -38,13 +35,14 @@ from flwr.common import (
     NDArrays,
     Parameters,
     Scalar,
-    ndarrays_to_parameters,
     parameters_to_ndarrays,
 )
 from flwr.common.logger import log
+from flwr.server import ClientManager
 from flwr.server.client_proxy import ClientProxy
-from flwr.server.strategy.aggregate import aggregate, aggregate_inplace, weighted_loss_avg
 from flwr.server.strategy.strategy import Strategy
+
+from ClientManager.client_manager import SimpleClientManager
 from Utils.preferences import Preferences
 
 WARNING_MIN_AVAILABLE_CLIENTS_TOO_LOW = """
@@ -89,8 +87,8 @@ class CustomEvaluation(Strategy):
         pass
 
     def aggregate_fit(self, server_round: int, results: list[tuple[ClientProxy, FitRes]],
-                      failures: list[Union[tuple[ClientProxy, FitRes], BaseException]]) -> tuple[
-        Optional[Parameters], dict[str, Scalar]]:
+                      failures: list[tuple[ClientProxy, FitRes] | BaseException]) -> tuple[
+        Parameters | None, dict[str, Scalar]]:
         pass
 
     # pylint: disable=too-many-arguments,too-many-instance-attributes, line-too-long
@@ -174,7 +172,7 @@ class CustomEvaluation(Strategy):
         Returns:
             str: Representation including accept_failures flag.
         """
-        rep = f"CustomEvaluation"
+        rep = "CustomEvaluation"
         return rep
 
 
@@ -503,68 +501,68 @@ class CustomEvaluation(Strategy):
         agg_metrics = {}
 
         amb = [n_examples*np.array(json.loads(metric["amb"])) for n_examples, metric, _ in metrics]
-        agg_metrics[f"amb"] = np.sum(amb,axis=0) / total_examples
+        agg_metrics["amb"] = np.sum(amb,axis=0) / total_examples
         #print("ambiguity", amb,agg_metrics["amb"])
 
         disc = [n_examples/total_examples * np.array(json.loads(metric["disc"])) for n_examples, metric, _ in metrics]
         # print(disc)
-        agg_metrics[f"disc"] = np.max(disc, axis=0)
+        agg_metrics["disc"] = np.max(disc, axis=0)
         #print("discrepancy", disc,agg_metrics["disc"])
 
         disa_hat =np.cumsum(np.sum([json.loads(metric["disa_hat_difpriv"]) for n_examples, metric, _ in metrics], axis=0), axis=1)
         disa_hat_cum = [entry/entry[-1] for entry in disa_hat]
 
-        agg_metrics[f"disa_hat_90_difpriv"] = [float(np.searchsorted(entry, 0.9, "left")*0.001) for entry in disa_hat_cum]
-        agg_metrics[f"disa_hat_50_difpriv"] =[float(np.searchsorted(entry, 0.5)*0.001)for entry in disa_hat_cum]
+        agg_metrics["disa_hat_90_difpriv"] = [float(np.searchsorted(entry, 0.9, "left")*0.001) for entry in disa_hat_cum]
+        agg_metrics["disa_hat_50_difpriv"] =[float(np.searchsorted(entry, 0.5)*0.001)for entry in disa_hat_cum]
         for entry in disa_hat_cum:
             entry[np.isnan(entry)] = 0
             #disa_hat_cum[entry] = entry
         #print(disa_hat, disa_hat_cum)
-        agg_metrics[f"disa_hat_difpriv"] = disa_hat_cum
+        agg_metrics["disa_hat_difpriv"] = disa_hat_cum
         #print(agg_metrics[f"disa_hat_90_difpriv"], agg_metrics[f"disa_hat_50_difpriv"])
 
         disa_hat = [json.loads(metric["disa_hat"]) for n_examples, metric, _ in metrics]
         disa_hat = [[e for entry in disa_hat for e in entry[i]] for i in range(len(disa_hat[0]))]
-        agg_metrics[f"disa_hat_90"] = np.quantile(disa_hat, 0.9, axis=1)
-        agg_metrics[f"disa_hat_50"] =np.quantile(disa_hat, 0.5, axis=1)
+        agg_metrics["disa_hat_90"] = np.quantile(disa_hat, 0.9, axis=1)
+        agg_metrics["disa_hat_50"] =np.quantile(disa_hat, 0.5, axis=1)
             #disa_hat_cum[entry] = entry
         #print(disa_hat, disa_hat_cum)
-        agg_metrics[f"disa_hat"] = disa_hat
+        agg_metrics["disa_hat"] = disa_hat
 
         vpr = np.cumsum(np.sum([json.loads(metric["vpr_difpriv"]) for n_examples, metric, _ in metrics], axis=0), axis=1)
         vpr_cum = [entry/entry[-1] for entry in vpr]
 
-        agg_metrics[f"vpr_90_difpriv"] =  [float(np.searchsorted(entry, 0.9)*0.001) for entry in vpr_cum]
-        agg_metrics[f"vpr_50_difpriv"] = [float(np.searchsorted(entry, 0.5) *0.001)for entry in vpr_cum]
+        agg_metrics["vpr_90_difpriv"] =  [float(np.searchsorted(entry, 0.9)*0.001) for entry in vpr_cum]
+        agg_metrics["vpr_50_difpriv"] = [float(np.searchsorted(entry, 0.5) *0.001)for entry in vpr_cum]
         for entry in vpr_cum:
             entry[np.isnan(entry)] = 0
         #print(vpr, vpr_cum)
-        agg_metrics[f"vpr_difpriv"] = vpr_cum
+        agg_metrics["vpr_difpriv"] = vpr_cum
         #print(agg_metrics[f"vpr_90_difpr"], agg_metrics[f"vpr_50"])
 
         vpr = [json.loads(metric["vpr"]) for n_examples, metric, _ in metrics]
         vpr = [[e for entry in vpr for e in entry[i]] for i in range(len(vpr[0]))]
-        agg_metrics[f"vpr_90"] =np.quantile(vpr, 0.9, axis=1)
+        agg_metrics["vpr_90"] =np.quantile(vpr, 0.9, axis=1)
         print (vpr[2][:10])
-        agg_metrics[f"vpr_50"] =np.quantile(vpr, 0.5, axis=1)
-        agg_metrics[f"vpr"] = vpr
+        agg_metrics["vpr_50"] =np.quantile(vpr, 0.5, axis=1)
+        agg_metrics["vpr"] = vpr
 
         score_var = np.cumsum(np.sum([json.loads(metric["score_var_difpriv"]) for n_examples, metric, _ in metrics], axis=0), axis=1)
         score_var_cum = [entry/entry[-1] for entry in score_var]
         #print(score_var, score_var_cum)
 
-        agg_metrics[f"score_var_90_difpriv"] =  [float(np.searchsorted(entry, 0.9) *0.001)for entry in score_var_cum]
-        agg_metrics[f"score_var_50_difpriv"] = [float(np.searchsorted(entry, 0.5)*0.001) for entry in score_var_cum]
+        agg_metrics["score_var_90_difpriv"] =  [float(np.searchsorted(entry, 0.9) *0.001)for entry in score_var_cum]
+        agg_metrics["score_var_50_difpriv"] = [float(np.searchsorted(entry, 0.5)*0.001) for entry in score_var_cum]
         for entry in score_var_cum:
             entry[np.isnan(entry)] = 0
-        agg_metrics[f"score_var_difpriv"] = score_var_cum
+        agg_metrics["score_var_difpriv"] = score_var_cum
         #print(agg_metrics[f"score_var_90"], agg_metrics[f"score_var_50"])
 
         score_var = [json.loads(metric["score_var"]) for n_examples, metric, _ in metrics]
         score_var = [[e for entry in score_var for e in entry[i]] for i in range(len(score_var[0]))]
-        agg_metrics[f"score_var_90"] = np.quantile(score_var, 0.9, axis=1)
-        agg_metrics[f"score_var_50"] =np.quantile(score_var, 0.5, axis=1)
-        agg_metrics[f"score_var"] = score_var
+        agg_metrics["score_var_90"] = np.quantile(score_var, 0.9, axis=1)
+        agg_metrics["score_var_50"] =np.quantile(score_var, 0.5, axis=1)
+        agg_metrics["score_var"] = score_var
         # print(score_var, score_var_cum)
 
         if self.wandb_run:

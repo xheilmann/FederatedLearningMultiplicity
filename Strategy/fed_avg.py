@@ -22,7 +22,6 @@ from collections.abc import Callable
 from logging import WARNING
 from typing import Any
 
-from ClientManager.client_manager import SimpleClientManager
 from flwr.common import (
     EvaluateIns,
     EvaluateRes,
@@ -39,6 +38,8 @@ from flwr.common.logger import log
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.strategy.aggregate import aggregate, aggregate_inplace, weighted_loss_avg
 from flwr.server.strategy.strategy import Strategy
+
+from ClientManager.client_manager import SimpleClientManager
 from Utils.preferences import Preferences
 
 WARNING_MIN_AVAILABLE_CLIENTS_TOO_LOW = """

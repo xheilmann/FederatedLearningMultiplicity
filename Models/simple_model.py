@@ -1,11 +1,8 @@
-import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
 from Models.model import Model
-from fairlearn.metrics import MetricFrame, count, demographic_parity_difference, true_positive_rate, \
-    false_positive_rate, selection_rate
 
 
 #TODO change evaluation

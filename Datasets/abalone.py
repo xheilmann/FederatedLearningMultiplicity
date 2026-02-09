@@ -3,9 +3,10 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import torch
-from Client.client import FlowerClient
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from torch.utils.data import DataLoader, Dataset
+
+from Client.client import FlowerClient
 from Utils.preferences import Preferences
 
 
