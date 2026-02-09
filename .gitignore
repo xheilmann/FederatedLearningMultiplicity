@@ -1,0 +1,15 @@
+*.npz
+*.json
+*.log
+*.wandb
+wandb/
+__pycache__/
+*.pyc
+*.pkl
+*.new
+wandb-summary.json
+.venv/
+venv/
+env/
+.DS_Store
+.vscode/
