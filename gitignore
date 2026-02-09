@@ -1,0 +1,9 @@
+*.npz
+*.json
+*.log
+*.wandb
+wandb/
+__pycache__/
+*.pyc
+*.pkl
+*.new
